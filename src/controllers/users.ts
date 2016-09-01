@@ -10,7 +10,7 @@ export class UsersController {
     }
 
     @action('get', '/x')
-    x(req: string, res: Response) {
+    x(req: Request, res: Response) {
         res.json(this.foo);
     }
 }
