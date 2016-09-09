@@ -1,6 +1,7 @@
 dist
 data
 uploads
+typings
 
 # Logs
 logs
