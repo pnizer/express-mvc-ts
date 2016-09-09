@@ -5,7 +5,7 @@ import { TokenHelper }  from "../security/token";
 import { MongoRepository } from "../repository/mongo-repository";
 
 export function auth() {
-    return (req, res, next) => {
+    return async function(req, res, next) {
         let auth = req.header('Authorization');
         if (!auth || !auth.startsWith('Bearer ')) {
             res.status(401).send("401 Unauthorized");
@@ -24,17 +24,16 @@ export function auth() {
             return;                        
         }
 
-        MongoRepository.users.findOne({username: data.username}).then(user => {
-            if (!user) {
+        try {
+            req.user = await MongoRepository.users.findOne({username: data.username});
+            if (!req.user) {
                 res.status(401).send("User not found!");
                 return;                                            
             }
-
-            req.user = user;
             next();
-        }).catch(err => {
+        } catch (err) {
             console.error(err);            
-            res.status(401).send("User not found!");
-        });
+            res.status(500).json(err);
+        }
     }
 }
