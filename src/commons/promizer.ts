@@ -40,3 +40,25 @@ export function value<T>(fn: (...args: any[]) => any): (...args: any[]) => Promi
     };
 }
 
+
+export function promisify<T>(obj: T, methods: string[]): void {
+    for (let method of methods) {
+        obj[method] = errvalue(obj[method].bind(obj))
+    }
+}
+
+export function newCb<T>(resolve, reject): (err: any, value: T) => void {
+    return (err, value) => {
+        if (err) {
+            reject(err);
+        } else {
+            resolve(value);
+        }
+    }
+}
+
+export function ErrValue<T>(fn: (cb: (err: any, value: T) => any) => any): Promise<T> {
+    return new Promise((resolve, reject) => {
+        fn(newCb(resolve, reject))
+    })
+}
